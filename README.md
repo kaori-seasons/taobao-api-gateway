@@ -28,7 +28,7 @@ graph TD
 
 ```mermaid
 graph TD
-    Nginx((Nginx (负载均衡器)))
+    Nginx[Nginx 负载均衡器]
     ServiceGroup1[服务组 1]
     ServiceGroup2[服务组 2]
     ServiceGroupN[服务组 N]
@@ -41,27 +41,42 @@ graph TD
 
 ```mermaid
 graph TD
-    ProtocolParsing((协议解析))
-    RPCInvocation((RPC调用))
-    ResultPackaging((结果封装))
+    ProtocolParsing[协议解析]
+    RPCInvocation[RPC调用]
+    ResultPackaging[结果封装]
+    ServiceRegistration[服务注册]
+    ServiceDiscovery[服务发现]
+    ServiceMonitoring[服务监控]
     ProtocolParsing --> RPCInvocation
     RPCInvocation --> ResultPackaging
-    ResultPackaging --> ServiceRegistration((服务注册))
-    ResultPackaging --> ServiceDiscovery((服务发现))
-    ResultPackaging --> ServiceMonitoring((服务监控))
+    ResultPackaging --> ServiceRegistration
+    ResultPackaging --> ServiceDiscovery
+    ResultPackaging --> ServiceMonitoring
 ```
 
 ### 组件层
 
 ```mermaid
 graph TD
-    CircuitBreaker((熔断)) -->|组件扩展| SPIExtension
-    Degradation((降级)) -->|组件扩展| SPIExtension
-    RateLimiting((限流)) -->|组件扩展| SPIExtension
-    Cutting((切量)) -->|组件扩展| SPIExtension
-    Monitoring((监控)) -->|组件扩展| SPIExtension
-    GrayRelease((灰度)) -->|组件扩展| SPIExtension
-    SPIExtension((SPI 组件扩展)) -->|路由策略| RoutingPolicy
+    CircuitBreaker[熔断]
+    Degradation[降级]
+    RateLimiting[限流]
+    Cutting[切量]
+    Monitoring[监控]
+    GrayRelease[灰度]
+    SPIExtension[SPI 组件扩展]
+    RoutingPolicy[路由策略]
+    WeightCalculation[权重计算]
+    PoolingTechnology[池化技术]
+    MoreFeatures[更多功能]
+    
+    CircuitBreaker -->|组件扩展| SPIExtension
+    Degradation -->|组件扩展| SPIExtension
+    RateLimiting -->|组件扩展| SPIExtension
+    Cutting -->|组件扩展| SPIExtension
+    Monitoring -->|组件扩展| SPIExtension
+    GrayRelease -->|组件扩展| SPIExtension
+    SPIExtension -->|路由策略| RoutingPolicy
     SPIExtension -->|权重计算| WeightCalculation
     SPIExtension -->|池化技术| PoolingTechnology
     SPIExtension -->|...| MoreFeatures
@@ -71,20 +86,31 @@ graph TD
 
 ```mermaid
 graph TD
-    Netty4x((Netty 4.x)) -->|技术支撑| TechnicalSupport
-    RateLimiter((RateLimiter)) -->|技术支撑| TechnicalSupport
-    ApacheShiro((Apache Shiro)) -->|技术支撑| TechnicalSupport
-    JWT((JWT)) -->|技术支撑| TechnicalSupport
-    Cglib((Cglib)) -->|技术支撑| TechnicalSupport
-    Dubbo((Dubbo)) -->|技术支撑| TechnicalSupport
-    Nginx((Nginx)) -->|技术支撑| TechnicalSupport
+    Netty4x[Netty 4.x]
+    RateLimiter[RateLimiter]
+    ApacheShiro[Apache Shiro]
+    JWT[JWT]
+    Cglib[Cglib]
+    Dubbo[Dubbo]
+    Nginx[Nginx]
+    TechnicalSupport[技术支撑]
+    
+    Netty4x -->|技术支撑| TechnicalSupport
+    RateLimiter -->|技术支撑| TechnicalSupport
+    ApacheShiro -->|技术支撑| TechnicalSupport
+    JWT -->|技术支撑| TechnicalSupport
+    Cglib -->|技术支撑| TechnicalSupport
+    Dubbo -->|技术支撑| TechnicalSupport
+    Nginx -->|技术支撑| TechnicalSupport
 ```
 
 ### 配置中心
 
 ```mermaid
 graph TD
-    ConfigurationCenter((配置中心)) -->|管理| ManagementPlatform
+    ConfigurationCenter[配置中心]
+    ManagementPlatform[管理平台]
+    ConfigurationCenter -->|管理| ManagementPlatform
 ```
 
 ### 服务模块
@@ -393,9 +419,10 @@ taobao-api-gateway/
 
 ### 详细设计文档
 - [设计文档](design.md) - 百万QPS实现方案
-- [模块设计](module-design.md) - 各子功能模块详细设计
+- [模块设计](module-design.md) - 各子功能模块详细设计（包含负载均衡时序图）
 - [系统架构](system-architecture.md) - 系统架构图和模块关系
 - [项目结构](project-structure.md) - 详细的项目结构说明
+- [开发排期](development-schedule.md) - 项目开发分阶段排期计划
 
 ### 扩展开发
 - 实现自定义过滤器
