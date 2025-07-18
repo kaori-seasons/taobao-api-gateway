@@ -49,7 +49,8 @@ public class ConsistentHashLoadBalancerTest {
         
         // 进行多次选择，统计分布情况
         for (int i = 0; i < 1000; i++) {
-            ServiceInstance selected = loadBalancer.select(serviceName, instances);
+            String requestKey = "request-" + i;
+            ServiceInstance selected = loadBalancer.select(serviceName, instances, requestKey);
             assertNotNull(selected, "应该能选择到服务实例");
             
             String instanceId = selected.getId();
@@ -81,7 +82,7 @@ public class ConsistentHashLoadBalancerTest {
         // 第一轮选择
         for (int i = 0; i < 100; i++) {
             String requestKey = "request-" + i;
-            ServiceInstance selected = loadBalancer.select(serviceName, instances);
+            ServiceInstance selected = loadBalancer.select(serviceName, instances, requestKey);
             requestToInstance.put(requestKey, selected);
         }
         
@@ -89,7 +90,7 @@ public class ConsistentHashLoadBalancerTest {
         int consistentCount = 0;
         for (int i = 0; i < 100; i++) {
             String requestKey = "request-" + i;
-            ServiceInstance selected = loadBalancer.select(serviceName, instances);
+            ServiceInstance selected = loadBalancer.select(serviceName, instances, requestKey);
             ServiceInstance previous = requestToInstance.get(requestKey);
             
             if (selected.equals(previous)) {
@@ -112,7 +113,7 @@ public class ConsistentHashLoadBalancerTest {
         // 记录移除节点前的选择结果
         for (int i = 0; i < 100; i++) {
             String requestKey = "request-" + i;
-            ServiceInstance selected = loadBalancer.select(serviceName, instances);
+            ServiceInstance selected = loadBalancer.select(serviceName, instances, requestKey);
             beforeRemoval.put(requestKey, selected);
         }
         
@@ -124,7 +125,7 @@ public class ConsistentHashLoadBalancerTest {
         Map<String, ServiceInstance> afterRemoval = new HashMap<>();
         for (int i = 0; i < 100; i++) {
             String requestKey = "request-" + i;
-            ServiceInstance selected = loadBalancer.select(serviceName, reducedInstances);
+            ServiceInstance selected = loadBalancer.select(serviceName, reducedInstances, requestKey);
             afterRemoval.put(requestKey, selected);
         }
         
@@ -159,7 +160,7 @@ public class ConsistentHashLoadBalancerTest {
         // 记录添加节点前的选择结果
         for (int i = 0; i < 100; i++) {
             String requestKey = "request-" + i;
-            ServiceInstance selected = loadBalancer.select(serviceName, instances);
+            ServiceInstance selected = loadBalancer.select(serviceName, instances, requestKey);
             beforeAddition.put(requestKey, selected);
         }
         
@@ -171,7 +172,7 @@ public class ConsistentHashLoadBalancerTest {
         Map<String, ServiceInstance> afterAddition = new HashMap<>();
         for (int i = 0; i < 100; i++) {
             String requestKey = "request-" + i;
-            ServiceInstance selected = loadBalancer.select(serviceName, expandedInstances);
+            ServiceInstance selected = loadBalancer.select(serviceName, expandedInstances, requestKey);
             afterAddition.put(requestKey, selected);
         }
         
@@ -209,7 +210,8 @@ public class ConsistentHashLoadBalancerTest {
         
         // 进行多次选择
         for (int i = 0; i < 1000; i++) {
-            ServiceInstance selected = loadBalancer.select(serviceName, weightedInstances);
+            String requestKey = "request-" + i;
+            ServiceInstance selected = loadBalancer.select(serviceName, weightedInstances, requestKey);
             String instanceId = selected.getId();
             distribution.put(instanceId, distribution.getOrDefault(instanceId, 0) + 1);
         }
@@ -233,7 +235,7 @@ public class ConsistentHashLoadBalancerTest {
         logger.info("测试空实例列表的处理");
         
         String serviceName = "empty-test";
-        ServiceInstance selected = loadBalancer.select(serviceName, new ArrayList<>());
+        ServiceInstance selected = loadBalancer.select(serviceName, new ArrayList<>(), "request-0");
         
         assertNull(selected, "空实例列表应该返回null");
     }
@@ -258,7 +260,8 @@ public class ConsistentHashLoadBalancerTest {
         
         // 进行多次选择
         for (int i = 0; i < 100; i++) {
-            ServiceInstance selected = loadBalancer.select(serviceName, mixedInstances);
+            String requestKey = "request-" + i;
+            ServiceInstance selected = loadBalancer.select(serviceName, mixedInstances, requestKey);
             assertNotNull(selected, "应该能选择到健康的服务实例");
             assertTrue(selected.isHealthy(), "选择的实例应该是健康的");
             

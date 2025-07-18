@@ -87,6 +87,16 @@ gateway:
     max-retries: 3
     load-balancer:
       strategy: ROUND_ROBIN
+      # 一致性哈希负载均衡器配置
+      consistent-hash:
+        enabled: true
+        virtual-nodes: 150
+        hash-algorithm: MD5
+        weight-aware: true
+        enable-cache: true
+        cache-expire-time: 300000
+        enable-statistics: true
+        statistics-cleanup-interval: 3600000
     rate-limiter:
       enabled: true
       default-rate: 1000

@@ -138,14 +138,71 @@ graph TD
     LocationA2((192.168.1.103)) -->|Nginx| NginxServer
 ```
 
+## 项目进度
+
+### 已完成模块
+
+#### 第一阶段：核心基础模块 ✅
+- [x] **负载均衡模块**: 支持轮询、加权轮询、最少连接数、一致性哈希等策略
+- [x] **服务发现模块**: 基于内存的服务注册与发现
+- [x] **限流模块**: 基于令牌桶算法的限流器
+- [x] **熔断器模块**: 支持开启、关闭、半开状态的熔断器
+- [x] **路由管理模块**: 支持多种路由匹配策略
+
+#### 第二阶段：缓存模块 ✅
+- [x] **缓存管理器**: 统一的缓存管理接口和实现
+- [x] **一级缓存**: 基于Caffeine的高性能本地缓存
+- [x] **二级缓存**: 基于Redis的分布式缓存
+- [x] **二级缓存**: 整合L1和L2的二级缓存实现
+- [x] **缓存配置**: 灵活的缓存配置和策略
+- [x] **缓存统计**: 详细的缓存命中率和性能统计
+
+### 缓存模块特性
+
+#### 核心功能
+- **二级缓存架构**: L1本地缓存(Caffeine) + L2分布式缓存(Redis)
+- **灵活的更新策略**: 支持写穿、写回、写分配三种模式
+- **丰富的驱逐策略**: LRU、LFU、FIFO、随机驱逐
+- **批量操作支持**: 批量获取、设置、删除操作
+- **优雅降级**: 当Redis不可用时自动降级到本地缓存
+
+#### 性能特性
+- **高并发**: 基于Caffeine的高性能本地缓存
+- **低延迟**: 本地缓存命中时纳秒级响应
+- **高可用**: Redis故障时自动降级
+- **可扩展**: 支持集群部署和水平扩展
+
+#### 监控统计
+- **命中率统计**: L1/L2缓存命中率分别统计
+- **性能监控**: 加载时间、驱逐次数等指标
+- **容量监控**: 缓存大小、内存使用情况
+- **操作统计**: 读写操作次数和成功率
+
+### 待开发模块
+
+#### 第三阶段：监控模块 🔄
+- [ ] **指标收集**: 性能指标、业务指标收集
+- [ ] **监控面板**: 可视化监控界面
+- [ ] **告警系统**: 异常告警和通知
+
+#### 第四阶段：管理后台 🔄
+- [ ] **配置管理**: 动态配置更新
+- [ ] **服务管理**: 服务注册、发现管理
+- [ ] **路由管理**: 路由规则配置
+
+#### 第五阶段：配置中心 🔄
+- [ ] **配置存储**: 配置信息持久化
+- [ ] **配置同步**: 多节点配置同步
+- [ ] **版本管理**: 配置版本控制
+
 ## 快速开始
 
 ### 环境要求
 
 - JDK 11+
 - Maven 3.6+
-- Redis 6.0+
-- MySQL 8.0+
+- Redis 6.0+ (可选，用于二级缓存)
+- MySQL 8.0+ (可选，用于配置存储)
 
 ### 安装步骤
 
@@ -185,6 +242,77 @@ mvn spring-boot:run -pl api-gateway-core
 
 # 启动管理后台
 mvn spring-boot:run -pl api-gateway-admin
+```
+
+### 负载均衡模块特性
+
+#### 一致性哈希负载均衡器
+- **一致性保证**: 节点变化时只有少量请求需要重新分配
+- **虚拟节点**: 支持虚拟节点，提高负载均衡效果
+- **权重感知**: 支持权重感知的虚拟节点分配
+- **哈希算法**: 支持MD5、SHA-256等多种哈希算法
+- **监控统计**: 提供详细的负载分布和性能统计
+- **自定义策略**: 支持自定义哈希键生成策略
+
+#### 负载均衡策略对比
+| 策略 | 适用场景 | 优势 | 劣势 |
+|------|----------|------|------|
+| 轮询 | 通用场景 | 简单、均匀 | 不考虑节点状态 |
+| 权重轮询 | 节点性能差异 | 考虑节点权重 | 动态调整复杂 |
+| 最少连接数 | 长连接场景 | 负载均衡效果好 | 统计开销大 |
+| 一致性哈希 | 缓存场景 | 节点变化影响小 | 实现复杂 |
+
+### 缓存模块使用示例
+
+#### 基本使用
+```java
+// 创建缓存管理器
+CacheConfig config = new CacheConfig("userCache");
+config.setL1MaxSize(1000);
+config.setL1ExpireAfterWrite(Duration.ofMinutes(30));
+config.setL2ExpireAfterWrite(Duration.ofHours(2));
+
+CacheManager cacheManager = new DefaultCacheManager(config);
+
+// 获取缓存
+Cache<String, User> userCache = cacheManager.getCache("userCache", String.class, User.class);
+
+// 基本操作
+userCache.put("user1", new User("张三", 25));
+User user = userCache.get("user1");
+
+// 使用加载器
+User user2 = userCache.get("user2", key -> loadUserFromDatabase(key));
+
+// 批量操作
+Map<String, User> users = userCache.getAll(Arrays.asList("user1", "user2", "user3"));
+```
+
+#### 缓存配置
+```yaml
+# application.yml
+cache:
+  l1:
+    enabled: true
+    max-size: 1000
+    expire-after-write: 30m
+    expire-after-access: 10m
+  l2:
+    enabled: true
+    expire-after-write: 2h
+  update-mode: WRITE_THROUGH  # WRITE_THROUGH, WRITE_BACK, WRITE_AROUND
+  eviction-policy: LRU        # LRU, LFU, FIFO, RANDOM
+  stats-enabled: true
+```
+
+#### 性能监控
+```java
+// 获取缓存统计信息
+CacheStats stats = userCache.getStats();
+System.out.println("命中率: " + stats.getHitRate());
+System.out.println("L1命中率: " + stats.getL1HitRate());
+System.out.println("L2命中率: " + stats.getL2HitRate());
+System.out.println("平均加载时间: " + stats.getAverageLoadTime() + "ms");
 ```
 
 ### 配置说明

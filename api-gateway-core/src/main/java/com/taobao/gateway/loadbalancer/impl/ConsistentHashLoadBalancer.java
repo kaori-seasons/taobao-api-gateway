@@ -80,7 +80,7 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
     }
     
     @Override
-    public ServiceInstance select(String serviceName, List<ServiceInstance> instances) {
+    public ServiceInstance select(String serviceName, List<ServiceInstance> instances, String requestKey) {
         if (instances == null || instances.isEmpty()) {
             logger.warn("没有可用的服务实例: {}", serviceName);
             return null;
@@ -103,7 +103,6 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
         }
         
         // 生成请求的哈希键
-        String requestKey = generateRequestKey(serviceName);
         long hash = hash(requestKey);
         
         // 在哈希环上查找目标节点
@@ -116,6 +115,12 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
         }
         
         return selected;
+    }
+    
+    @Override
+    public ServiceInstance select(String serviceName, List<ServiceInstance> instances) {
+        // 兼容老接口，使用serviceName作为requestKey
+        return select(serviceName, instances, serviceName);
     }
     
     @Override
@@ -173,9 +178,13 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
      */
     private void addVirtualNodes(ServiceInstance instance) {
         String instanceId = instance.getId();
+        int weight = instance.getWeight();
+        
+        // 根据权重计算虚拟节点数量，权重越高，虚拟节点越多
+        int nodeCount = Math.max(1, (virtualNodes * weight) / 100);
         
         // 为每个实例创建多个虚拟节点，提高负载均衡效果
-        for (int i = 0; i < virtualNodes; i++) {
+        for (int i = 0; i < nodeCount; i++) {
             String virtualNodeName = instanceId + "#" + i;
             long hash = hash(virtualNodeName);
             hashRing.put(hash, instance);
@@ -204,18 +213,6 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
             
             return null;
         }
-    }
-    
-    /**
-     * 生成请求的哈希键
-     * 
-     * @param serviceName 服务名称
-     * @return 请求哈希键
-     */
-    private String generateRequestKey(String serviceName) {
-        // 这里可以根据实际需求生成更复杂的哈希键
-        // 例如：结合用户ID、请求路径、时间戳等
-        return serviceName + "_" + System.currentTimeMillis();
     }
     
     /**
