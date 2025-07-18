@@ -107,7 +107,7 @@ public class GatewayResponse {
      * @param responseTime 响应时间（毫秒）
      * @return 当前响应对象
      */
-    public GatewayResponse setResponseTime(long responseTime) {
+    public GatewayResponse withResponseTime(long responseTime) {
         this.responseTime = responseTime;
         return this;
     }

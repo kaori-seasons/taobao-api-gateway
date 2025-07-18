@@ -107,7 +107,7 @@ public class GatewayRequest {
      * @param body 请求体
      * @return 当前请求对象
      */
-    public GatewayRequest setBody(String body) {
+    public GatewayRequest withBody(String body) {
         this.body = body;
         return this;
     }
@@ -118,7 +118,7 @@ public class GatewayRequest {
      * @param timeout 超时时间（毫秒）
      * @return 当前请求对象
      */
-    public GatewayRequest setTimeout(long timeout) {
+    public GatewayRequest withTimeout(long timeout) {
         this.timeout = timeout;
         return this;
     }

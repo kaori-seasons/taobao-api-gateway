@@ -23,6 +23,11 @@ public class Route {
     private String path;
 
     /**
+     * HTTP方法
+     */
+    private String method = "GET";
+
+    /**
      * 目标服务地址
      */
     private String target;
@@ -61,6 +66,13 @@ public class Route {
         this.target = target;
     }
 
+    public Route(String id, String path, String method, String target) {
+        this.id = id;
+        this.path = path;
+        this.method = method;
+        this.target = target;
+    }
+
     // Getter和Setter方法
     public String getId() {
         return id;
@@ -76,6 +88,14 @@ public class Route {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public String getTarget() {
@@ -131,6 +151,7 @@ public class Route {
         return "Route{" +
                 "id='" + id + '\'' +
                 ", path='" + path + '\'' +
+                ", method='" + method + '\'' +
                 ", target='" + target + '\'' +
                 ", weight=" + weight +
                 ", timeout=" + timeout +

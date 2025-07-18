@@ -1,10 +1,13 @@
 package com.taobao.gateway.router;
 
+import com.taobao.gateway.router.impl.DefaultRouteMatcher;
 import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,23 +24,25 @@ public class DefaultRouteManager implements RouteManager {
     private static final Logger logger = LoggerFactory.getLogger(DefaultRouteManager.class);
 
     /**
-     * 路由规则缓存
+     * 路由匹配器
      */
-    private final Map<String, Route> routeCache = new ConcurrentHashMap<>();
+    @Autowired
+    private DefaultRouteMatcher routeMatcher;
 
     @Override
     public RouteResult route(FullHttpRequest request) {
         String path = request.uri();
-        logger.debug("路由请求: {}", path);
+        String method = request.method().name();
+        logger.debug("路由请求: {} {}", method, path);
 
-        // 查找匹配的路由规则
-        Route matchedRoute = findMatchedRoute(path);
+        // 使用路由匹配器查找匹配的路由规则
+        Route matchedRoute = routeMatcher.match(path, method);
         
         if (matchedRoute != null) {
             logger.debug("找到匹配的路由: {}", matchedRoute);
             return RouteResult.success(matchedRoute);
         } else {
-            logger.warn("未找到匹配的路由: {}", path);
+            logger.warn("未找到匹配的路由: {} {}", method, path);
             return RouteResult.failure("No route found for path: " + path);
         }
     }
@@ -45,71 +50,60 @@ public class DefaultRouteManager implements RouteManager {
     @Override
     public void addRoute(Route route) {
         if (route != null && route.getPath() != null) {
-            routeCache.put(route.getPath(), route);
+            routeMatcher.addRoute(route);
             logger.info("添加路由规则: {}", route);
         }
     }
 
     @Override
     public void removeRoute(String path) {
-        Route removedRoute = routeCache.remove(path);
-        if (removedRoute != null) {
-            logger.info("移除路由规则: {}", removedRoute);
+        // 通过路径查找路由ID，然后移除
+        List<Route> allRoutes = routeMatcher.getAllRoutes();
+        for (Route route : allRoutes) {
+            if (route.getPath().equals(path)) {
+                routeMatcher.removeRoute(route.getId());
+                logger.info("移除路由规则: {}", route);
+                break;
+            }
         }
     }
 
     @Override
     public void updateRoute(Route route) {
         if (route != null && route.getPath() != null) {
-            routeCache.put(route.getPath(), route);
+            routeMatcher.updateRoute(route);
             logger.info("更新路由规则: {}", route);
         }
     }
 
     @Override
     public Route getRoute(String path) {
-        return routeCache.get(path);
-    }
-
-    /**
-     * 查找匹配的路由规则
-     */
-    private Route findMatchedRoute(String path) {
-        // 首先尝试精确匹配
-        Route exactRoute = routeCache.get(path);
-        if (exactRoute != null && exactRoute.isEnabled()) {
-            return exactRoute;
-        }
-
-        // 然后尝试前缀匹配
-        for (Route route : routeCache.values()) {
-            if (!route.isEnabled()) {
-                continue;
-            }
-
-            if (route.getType() == RouteType.PREFIX && path.startsWith(route.getPath())) {
+        // 通过路径查找路由
+        List<Route> allRoutes = routeMatcher.getAllRoutes();
+        for (Route route : allRoutes) {
+            if (route.getPath().equals(path)) {
                 return route;
             }
         }
-
-        // 最后尝试正则匹配（这里暂时不实现，后续会添加）
-        // TODO: 实现正则匹配
-
         return null;
     }
 
     /**
      * 获取所有路由规则
      */
-    public Map<String, Route> getAllRoutes() {
-        return new ConcurrentHashMap<>(routeCache);
+    public List<Route> getAllRoutes() {
+        return routeMatcher.getAllRoutes();
     }
 
     /**
      * 清空所有路由规则
      */
     public void clearRoutes() {
-        routeCache.clear();
+        // 获取所有路由并逐个移除
+        List<Route> allRoutes = routeMatcher.getAllRoutes();
+        for (Route route : allRoutes) {
+            routeMatcher.removeRoute(route.getId());
+        }
         logger.info("清空所有路由规则");
     }
 } 
