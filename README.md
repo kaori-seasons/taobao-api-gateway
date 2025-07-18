@@ -28,7 +28,6 @@ graph TD
 
 ```mermaid
 graph TD
-    graph TD
     Nginx((Nginx (负载均衡器)))
     ServiceGroup1[服务组 1]
     ServiceGroup2[服务组 2]
