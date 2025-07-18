@@ -28,19 +28,28 @@ graph TD
 
 ```mermaid
 graph TD
-    Nginx((Nginx (负载均衡))) -->|通信| NIO
+    graph TD
+    Nginx((Nginx (负载均衡器)))
+    ServiceGroup1[服务组 1]
+    ServiceGroup2[服务组 2]
+    ServiceGroupN[服务组 N]
+    Nginx --> ServiceGroup1
+    Nginx --> ServiceGroup2
+    Nginx --> ServiceGroupN
 ```
 
 ### 通信层
 
 ```mermaid
 graph TD
-    NIO((NIO)) -->|协议解析| ProtocolParsing
-    ProtocolParsing((协议解析)) -->|泛化调用(RPC)| RPCInvocation
-    RPCInvocation((泛化调用(RPC))) -->|结果封装| ResultPackaging
-    ResultPackaging((结果封装)) -->|服务接口注册| ServiceRegistration
-    ResultPackaging -->|服务接口发现| ServiceDiscovery
-    ResultPackaging -->|服务接口监控| ServiceMonitoring
+    ProtocolParsing((协议解析))
+    RPCInvocation((RPC调用))
+    ResultPackaging((结果封装))
+    ProtocolParsing --> RPCInvocation
+    RPCInvocation --> ResultPackaging
+    ResultPackaging --> ServiceRegistration((服务注册))
+    ResultPackaging --> ServiceDiscovery((服务发现))
+    ResultPackaging --> ServiceMonitoring((服务监控))
 ```
 
 ### 组件层
