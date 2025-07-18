@@ -1,6 +1,5 @@
 package com.taobao.gateway.cache.config;
 
-import com.taobao.gateway.cache.CacheConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,7 +36,7 @@ public class CacheProperties {
     /**
      * 自定义缓存配置
      */
-    private Map<String, CacheConfig> caches = new HashMap<>();
+    private Map<String, Object> caches = new HashMap<>();
     
     public Redis getRedis() {
         return redis;
@@ -63,11 +62,11 @@ public class CacheProperties {
         this.defaultConfig = defaultConfig;
     }
     
-    public Map<String, CacheConfig> getCaches() {
+    public Map<String, Object> getCaches() {
         return caches;
     }
     
-    public void setCaches(Map<String, CacheConfig> caches) {
+    public void setCaches(Map<String, Object> caches) {
         this.caches = caches;
     }
     
@@ -204,12 +203,12 @@ public class CacheProperties {
         /**
          * 更新模式
          */
-        private CacheConfig.CacheUpdateMode updateMode = CacheConfig.CacheUpdateMode.WRITE_THROUGH;
+        private String updateMode = "WRITE_THROUGH";
         
         /**
          * 驱逐策略
          */
-        private CacheConfig.CacheEvictionPolicy evictionPolicy = CacheConfig.CacheEvictionPolicy.LRU;
+        private String evictionPolicy = "LRU";
         
         public boolean isL1Enabled() {
             return l1Enabled;
@@ -251,19 +250,19 @@ public class CacheProperties {
             this.cacheNullValues = cacheNullValues;
         }
         
-        public CacheConfig.CacheUpdateMode getUpdateMode() {
+        public String getUpdateMode() {
             return updateMode;
         }
         
-        public void setUpdateMode(CacheConfig.CacheUpdateMode updateMode) {
+        public void setUpdateMode(String updateMode) {
             this.updateMode = updateMode;
         }
         
-        public CacheConfig.CacheEvictionPolicy getEvictionPolicy() {
+        public String getEvictionPolicy() {
             return evictionPolicy;
         }
         
-        public void setEvictionPolicy(CacheConfig.CacheEvictionPolicy evictionPolicy) {
+        public void setEvictionPolicy(String evictionPolicy) {
             this.evictionPolicy = evictionPolicy;
         }
     }
