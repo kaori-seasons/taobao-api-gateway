@@ -412,17 +412,24 @@ taobao-api-gateway/
 ├── api-gateway-sdk/           # SDK包
 ├── api-gateway-center/        # 注册中心
 ├── api-gateway-admin/         # 管理后台
-├── docs/                      # 文档
+├── doc/                       # 项目文档
+│   ├── README.md              # 文档索引
+│   ├── design.md              # 百万QPS设计文档
+│   ├── module-design.md       # 模块设计文档
+│   ├── system-architecture.md # 系统架构文档
+│   ├── project-structure.md   # 项目结构文档
+│   ├── development-schedule.md# 开发排期文档
+│   └── core-example.md        # 核心示例文档
 ├── scripts/                   # 脚本
 └── tests/                     # 测试
 ```
 
 ### 详细设计文档
-- [设计文档](design.md) - 百万QPS实现方案
-- [模块设计](module-design.md) - 各子功能模块详细设计（包含负载均衡时序图）
-- [系统架构](system-architecture.md) - 系统架构图和模块关系
-- [项目结构](project-structure.md) - 详细的项目结构说明
-- [开发排期](development-schedule.md) - 项目开发分阶段排期计划
+- [设计文档](doc/design.md) - 百万QPS实现方案
+- [模块设计](doc/module-design.md) - 各子功能模块详细设计（包含负载均衡时序图）
+- [系统架构](doc/system-architecture.md) - 系统架构图和模块关系
+- [项目结构](doc/project-structure.md) - 详细的项目结构说明
+- [开发排期](doc/development-schedule.md) - 项目开发分阶段排期计划
 
 ### 扩展开发
 - 实现自定义过滤器
