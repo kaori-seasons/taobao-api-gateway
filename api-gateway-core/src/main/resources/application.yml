@@ -1,0 +1,140 @@
+# Spring Boot应用配置
+spring:
+  application:
+    name: api-gateway
+  
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/api_gateway?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: HikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    database: 0
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 8192
+    accept-count: 100
+
+# Netty网关配置
+netty:
+  port: 8080
+  boss-threads: 1
+  worker-threads: 16
+  backlog: 1024
+  connection-timeout: 30000
+  read-timeout: 60000
+  write-timeout: 60000
+  tcp-no-delay: true
+  keep-alive: true
+  reuse-addr: true
+
+# 线程池配置
+thread-pool:
+  core-pool-size: 20
+  max-pool-size: 100
+  queue-capacity: 1000
+  keep-alive-seconds: 60
+  thread-name-prefix: gateway-
+  allow-core-thread-time-out: true
+  wait-for-tasks-to-complete-on-shutdown: true
+  await-termination-seconds: 60
+  rejected-execution-handler: CALLER_RUNS
+
+# 网关路由配置
+gateway:
+  routing:
+    default-timeout: 5000
+    max-retries: 3
+    load-balancer:
+      strategy: ROUND_ROBIN
+    rate-limiter:
+      enabled: true
+      default-rate: 1000
+      burst-capacity: 2000
+    circuit-breaker:
+      enabled: true
+      failure-threshold: 5
+      recovery-timeout: 60000
+      half-open-requests: 3
+
+# 缓存配置
+cache:
+  redis:
+    default-ttl: 3600
+    key-prefix: gateway:
+  local:
+    max-size: 1000
+    expire-after-write: 300
+
+# 监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# 日志配置
+logging:
+  level:
+    com.taobao.gateway: DEBUG
+    org.springframework: INFO
+    io.netty: INFO
+    org.hibernate: WARN
+    com.zaxxer.hikari: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/api-gateway.log
+    max-size: 100MB
+    max-history: 30 

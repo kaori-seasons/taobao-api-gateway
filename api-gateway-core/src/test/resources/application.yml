@@ -1,0 +1,41 @@
+# 测试环境配置
+spring:
+  # 禁用数据源自动配置，避免数据库连接错误
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+  
+  # 测试环境配置
+  profiles:
+    active: test
+
+# 网关配置
+gateway:
+  # 服务器配置
+  server:
+    port: 8080
+    boss-threads: 1
+    worker-threads: 4
+  
+  # 线程池配置
+  thread-pool:
+    core-size: 4
+    max-size: 8
+    queue-capacity: 1000
+    keep-alive-seconds: 60
+  
+  # 路由配置
+  routing:
+    default-timeout: 5000
+    max-retries: 3
+
+# 日志配置
+logging:
+  level:
+    com.taobao.gateway: DEBUG
+    org.springframework: INFO
+    io.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" 
