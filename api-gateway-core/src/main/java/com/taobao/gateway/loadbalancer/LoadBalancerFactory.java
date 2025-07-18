@@ -1,5 +1,6 @@
 package com.taobao.gateway.loadbalancer;
 
+import com.taobao.gateway.loadbalancer.impl.ConsistentHashLoadBalancer;
 import com.taobao.gateway.loadbalancer.impl.LeastConnectionsLoadBalancer;
 import com.taobao.gateway.loadbalancer.impl.RoundRobinLoadBalancer;
 import com.taobao.gateway.loadbalancer.impl.WeightedRoundRobinLoadBalancer;
@@ -69,6 +70,8 @@ public class LoadBalancerFactory {
                 return new WeightedRoundRobinLoadBalancer();
             case LEAST_CONNECTIONS:
                 return new LeastConnectionsLoadBalancer();
+            case CONSISTENT_HASH:
+                return new ConsistentHashLoadBalancer();
             default:
                 logger.warn("未知的负载均衡器类型: {}, 使用轮询算法", type);
                 return new RoundRobinLoadBalancer();
