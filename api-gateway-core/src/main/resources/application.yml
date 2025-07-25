@@ -154,6 +154,77 @@ gateway:
     # 是否启用监控统计
     metrics-enabled: true
 
+  # 自适应限流和负载均衡配置
+  adaptive:
+    # 是否启用自适应功能
+    enabled: true
+    # 自适应限流配置
+    ratelimit:
+      # 是否启用自适应限流
+      enabled: true
+      # 自适应策略类型
+      strategy-type: COMPREHENSIVE
+      # 基础限流阈值
+      base-limit: 1000
+      # 最小限流阈值
+      min-limit: 100
+      # 最大限流阈值
+      max-limit: 10000
+      # 调整步长
+      adjustment-step: 0.1
+      # 调整间隔（毫秒）
+      adjustment-interval: 5000
+      # CPU使用率阈值
+      cpu-threshold: 80.0
+      # 内存使用率阈值
+      memory-threshold: 80.0
+      # 响应时间阈值（毫秒）
+      response-time-threshold: 1000.0
+      # 错误率阈值
+      error-rate-threshold: 0.1
+      # 负载分数阈值
+      load-score-threshold: 80.0
+      # 是否启用平滑调整
+      smooth-adjustment: true
+      # 平滑因子 (0-1)
+      smooth-factor: 0.3
+      # 历史数据窗口大小
+      history-window-size: 10
+    # 自适应负载均衡配置
+    loadbalancer:
+      # 是否启用自适应负载均衡
+      enabled: true
+      # 自适应策略类型
+      strategy-type: SCORE_BASED
+      # 健康检查间隔（毫秒）
+      health-check-interval: 30000
+      # 指标更新间隔（毫秒）
+      metrics-update-interval: 5000
+      # 响应时间阈值（毫秒）
+      response-time-threshold: 1000.0
+      # 错误率阈值
+      error-rate-threshold: 0.1
+      # 负载阈值
+      load-threshold: 80.0
+      # 权重调整因子
+      weight-adjustment-factor: 0.1
+      # 最小权重
+      min-weight: 0.1
+      # 最大权重
+      max-weight: 10.0
+      # 是否启用平滑调整
+      smooth-adjustment: true
+      # 平滑因子 (0-1)
+      smooth-factor: 0.3
+      # 是否启用故障转移
+      failover-enabled: true
+      # 故障转移阈值
+      failover-threshold: 3
+      # 是否启用预热
+      warmup-enabled: true
+      # 预热时间（毫秒）
+      warmup-time: 60000
+
 # 缓存配置
 cache:
   # 是否启用缓存
