@@ -125,25 +125,53 @@ public class DefaultCacheManager implements CacheManager {
         
         if (mergedConfig.isL1Enabled() && mergedConfig.isL2Enabled()) {
             // 创建二级缓存
-            CaffeineCache<Object, Object> l1Cache = new CaffeineCache<>(cacheName + "_l1", mergedConfig);
-            // TODO: 需要实现JedisPool的具体实现
-            // RedisCache<Object, Object> l2Cache = new RedisCache<>(cacheName + "_l2", mergedConfig, jedisPool);
-            // return new L2Cache<>(cacheName, mergedConfig, l1Cache, l2Cache);
-            logger.warn("Redis缓存未实现，仅使用一级缓存: {}", cacheName);
-            return l1Cache;
+            Cache<Object, Object> l1Cache = createL1Cache(cacheName + "_l1", mergedConfig);
+            
+            if (redisConnectionFactory != null) {
+                RedisCache<Object, Object> l2Cache = new RedisCache<>(cacheName + "_l2", mergedConfig, redisConnectionFactory);
+                return new L2Cache<>(cacheName, mergedConfig, l1Cache, l2Cache);
+            } else {
+                logger.warn("Redis连接工厂未配置，仅使用一级缓存: {}", cacheName);
+                return l1Cache;
+            }
         } else if (mergedConfig.isL1Enabled()) {
             // 只创建一级缓存
-            return new CaffeineCache<>(cacheName, mergedConfig);
+            return createL1Cache(cacheName, mergedConfig);
         } else if (mergedConfig.isL2Enabled()) {
             // 只创建二级缓存
-            // TODO: 需要实现RedisConnectionFactory的具体实现
-            // return new RedisCache<>(cacheName, mergedConfig, redisConnectionFactory);
-            logger.warn("Redis缓存未实现，创建空缓存: {}", cacheName);
-            return new EmptyCache<>(cacheName);
+            if (redisConnectionFactory != null) {
+                return new RedisCache<>(cacheName, mergedConfig, redisConnectionFactory);
+            } else {
+                logger.warn("Redis连接工厂未配置，创建空缓存: {}", cacheName);
+                return new EmptyCache<>(cacheName);
+            }
         } else {
             // 都不启用，创建空缓存
             logger.warn("缓存未启用: {}", cacheName);
             return new EmptyCache<>(cacheName);
+        }
+    }
+    
+    /**
+     * 创建一级缓存
+     * 
+     * @param cacheName 缓存名称
+     * @param config 缓存配置
+     * @return 一级缓存实例
+     */
+    @SuppressWarnings("unchecked")
+    private Cache<Object, Object> createL1Cache(String cacheName, CacheConfig config) {
+        // 根据驱逐策略选择缓存实现
+        switch (config.getEvictionPolicy()) {
+            case LRU:
+            case LFU:
+            case FIFO:
+            case RANDOM:
+                // 使用自定义驱逐策略实现
+                return new EvictionBasedCache<>(cacheName, config);
+            default:
+                // 使用Caffeine实现
+                return new CaffeineCache<>(cacheName, config);
         }
     }
     

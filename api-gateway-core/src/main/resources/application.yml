@@ -106,15 +106,106 @@ gateway:
       failure-threshold: 5
       recovery-timeout: 60000
       half-open-requests: 3
+  # 分发层配置
+  dispatcher:
+    enabled: true
+    # 主Reactor线程数（接收连接的线程）
+    main-reactor-threads: 1
+    # 子Reactor线程数（处理IO的线程）
+    sub-reactor-threads: 16
+    # 业务处理线程池大小
+    business-thread-pool-size: 32
+    # 连接队列大小
+    backlog: 1024
+    # 连接超时时间（毫秒）
+    connection-timeout: 30000
+    # 读取超时时间（毫秒）
+    read-timeout: 60000
+    # 写入超时时间（毫秒）
+    write-timeout: 60000
+    # 最大请求体大小（字节）
+    max-content-length: 1048576
+    # 是否启用TCP_NODELAY
+    tcp-no-delay: true
+    # 是否启用SO_KEEPALIVE
+    keep-alive: true
+    # 是否启用SO_REUSEADDR
+    reuse-addr: true
+    # 是否启用零拷贝
+    zero-copy: true
+    # 是否启用直接内存
+    direct-buffer: true
+    # 缓冲区大小（字节）
+    buffer-size: 8192
+    # 是否启用连接池
+    connection-pool-enabled: true
+    # 连接池最大连接数
+    max-connections: 10000
+    # 连接池空闲连接数
+    idle-connections: 1000
+    # 连接池连接超时时间（毫秒）
+    pool-connection-timeout: 5000
+    # 是否启用请求限流
+    rate-limit-enabled: true
+    # 默认QPS限制
+    default-qps: 10000
+    # 是否启用熔断器
+    circuit-breaker-enabled: true
+    # 是否启用监控统计
+    metrics-enabled: true
 
 # 缓存配置
 cache:
+  # 是否启用缓存
+  enabled: true
+  # 缓存名称
+  name: default
+  # 是否启用一级缓存（本地缓存）
+  l1-enabled: true
+  # 是否启用二级缓存（Redis缓存）
+  l2-enabled: true
+  # 一级缓存最大大小
+  l1-max-size: 1000
+  # 一级缓存过期时间（毫秒）
+  l1-expire-after-write: 1800000
+  # 一级缓存访问后过期时间（毫秒）
+  l1-expire-after-access: 600000
+  # 二级缓存过期时间（毫秒）
+  l2-expire-after-write: 7200000
+  # 是否启用缓存统计
+  stats-enabled: true
+  # 是否启用缓存预热
+  warm-up-enabled: false
+  # 缓存键前缀
+  key-prefix: ""
+  # 是否启用空值缓存
+  cache-null-values: false
+  # 缓存更新模式
+  update-mode: WRITE_THROUGH
+  # 缓存驱逐策略
+  eviction-policy: LRU
+  # Redis配置
   redis:
-    default-ttl: 3600
-    key-prefix: gateway:
-  local:
-    max-size: 1000
-    expire-after-write: 300
+    # 是否启用Redis
+    enabled: true
+    # Redis主机地址
+    host: localhost
+    # Redis端口
+    port: 6379
+    # Redis密码
+    password: 
+    # Redis数据库索引
+    database: 0
+    # 连接超时时间（毫秒）
+    connection-timeout: 2000
+    # 最大连接数
+    max-total: 100
+    # 最大空闲连接数
+    max-idle: 20
+    # 最小空闲连接数
+    min-idle: 5
+    # 最大等待时间（毫秒）
+    max-wait: 3000
 
 # 监控配置
 management:
@@ -148,3 +239,5 @@ logging:
     name: logs/api-gateway.log
     max-size: 100MB
     max-history: 30 
+
+ 

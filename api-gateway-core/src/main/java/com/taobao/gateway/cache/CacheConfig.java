@@ -76,6 +76,11 @@ public class CacheConfig {
      */
     private CacheEvictionPolicy evictionPolicy = CacheEvictionPolicy.LRU;
     
+    /**
+     * Redis配置
+     */
+    private RedisConfig redis = new RedisConfig();
+    
     public CacheConfig() {
     }
     
@@ -186,6 +191,150 @@ public class CacheConfig {
     
     public void setEvictionPolicy(CacheEvictionPolicy evictionPolicy) {
         this.evictionPolicy = evictionPolicy;
+    }
+    
+    public RedisConfig getRedis() {
+        return redis;
+    }
+    
+    public void setRedis(RedisConfig redis) {
+        this.redis = redis;
+    }
+    
+    /**
+     * Redis配置类
+     */
+    public static class RedisConfig {
+        /**
+         * 是否启用Redis
+         */
+        private boolean enabled = true;
+        
+        /**
+         * Redis主机地址
+         */
+        private String host = "localhost";
+        
+        /**
+         * Redis端口
+         */
+        private int port = 6379;
+        
+        /**
+         * Redis密码
+         */
+        private String password;
+        
+        /**
+         * Redis数据库索引
+         */
+        private int database = 0;
+        
+        /**
+         * 连接超时时间（毫秒）
+         */
+        private int connectionTimeout = 2000;
+        
+        /**
+         * 最大连接数
+         */
+        private int maxTotal = 100;
+        
+        /**
+         * 最大空闲连接数
+         */
+        private int maxIdle = 20;
+        
+        /**
+         * 最小空闲连接数
+         */
+        private int minIdle = 5;
+        
+        /**
+         * 最大等待时间（毫秒）
+         */
+        private int maxWait = 3000;
+        
+        // Getter和Setter方法
+        public boolean isEnabled() {
+            return enabled;
+        }
+        
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+        
+        public String getHost() {
+            return host;
+        }
+        
+        public void setHost(String host) {
+            this.host = host;
+        }
+        
+        public int getPort() {
+            return port;
+        }
+        
+        public void setPort(int port) {
+            this.port = port;
+        }
+        
+        public String getPassword() {
+            return password;
+        }
+        
+        public void setPassword(String password) {
+            this.password = password;
+        }
+        
+        public int getDatabase() {
+            return database;
+        }
+        
+        public void setDatabase(int database) {
+            this.database = database;
+        }
+        
+        public int getConnectionTimeout() {
+            return connectionTimeout;
+        }
+        
+        public void setConnectionTimeout(int connectionTimeout) {
+            this.connectionTimeout = connectionTimeout;
+        }
+        
+        public int getMaxTotal() {
+            return maxTotal;
+        }
+        
+        public void setMaxTotal(int maxTotal) {
+            this.maxTotal = maxTotal;
+        }
+        
+        public int getMaxIdle() {
+            return maxIdle;
+        }
+        
+        public void setMaxIdle(int maxIdle) {
+            this.maxIdle = maxIdle;
+        }
+        
+        public int getMinIdle() {
+            return minIdle;
+        }
+        
+        public void setMinIdle(int minIdle) {
+            this.minIdle = minIdle;
+        }
+        
+        public int getMaxWait() {
+            return maxWait;
+        }
+        
+        public void setMaxWait(int maxWait) {
+            this.maxWait = maxWait;
+        }
     }
     
     /**
