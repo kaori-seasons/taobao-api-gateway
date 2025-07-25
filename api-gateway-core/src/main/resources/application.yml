@@ -154,6 +154,108 @@ gateway:
     # 是否启用监控统计
     metrics-enabled: true
 
+  # IoT网关配置
+  iot:
+    # 是否启用IoT网关
+    enabled: true
+    # 网关ID
+    gateway-id: "iot-gateway-001"
+    # 网关名称
+    gateway-name: "工业IoT网关"
+    # 服务器配置
+    server:
+      port: 8080
+      boss-threads: 1
+      worker-threads: 16
+      backlog: 1024
+      connection-timeout: 30000
+      read-timeout: 60000
+      write-timeout: 60000
+    # 设备配置
+    devices:
+      - device-id: "temp_sensor_001"
+        name: "温度传感器001"
+        protocol-type: "MODBUS_RTU"
+        connection:
+          type: "RS485"
+          serial-port: "/dev/ttyUSB0"
+          baud-rate: 9600
+          data-bits: 8
+          stop-bits: 1
+          parity: "NONE"
+        data-points:
+          temperature:
+            address: "30001"
+            data-type: "FLOAT32"
+            unit: "°C"
+            conversion:
+              formula: "value / 10"
+              scale: 0.1
+          humidity:
+            address: "30002"
+            data-type: "FLOAT32"
+            unit: "%RH"
+            conversion:
+              formula: "value / 10"
+              scale: 0.1
+        rules:
+          - name: "温度告警"
+            condition: "temperature > 50"
+            action: "send_alert"
+            level: "WARNING"
+      - device-id: "plc_001"
+        name: "PLC控制器001"
+        protocol-type: "MODBUS_TCP"
+        connection:
+          type: "TCP"
+          host: "192.168.1.100"
+          port: 502
+        data-points:
+          status:
+            address: "00001"
+            data-type: "BOOL"
+            unit: ""
+          speed:
+            address: "40001"
+            data-type: "INT16"
+            unit: "rpm"
+    # 协议配置
+    protocols:
+      modbus:
+        timeout: 3000
+        retries: 3
+        inter-frame-delay: 10
+        max-connections: 10
+        connection-pool:
+          max-idle: 5
+          max-active: 20
+          min-idle: 2
+          max-wait: 5000
+      opcua:
+        timeout: 5000
+        retries: 2
+        max-connections: 5
+    # 安全配置
+    security:
+      enabled: true
+      tls-enabled: true
+      encryption-algorithm: "AES"
+    # 缓存配置
+    cache:
+      enabled: true
+      local-cache-size: 1000
+      local-cache-expire-seconds: 300
+      redis-enabled: true
+      redis-host: "localhost"
+      redis-port: 6379
+      redis-database: 1
+    # 监控配置
+    monitor:
+      enabled: true
+      metrics-interval: 60
+      alert-enabled: true
+      health-check-interval: 30
+
   # 自适应限流和负载均衡配置
   adaptive:
     # 是否启用自适应功能
